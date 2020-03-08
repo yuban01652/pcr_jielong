@@ -329,8 +329,8 @@ function sortDataArray(dataArray) {
         }
 
         // 之后按下一步未点数量排序, 如果未启用下一步计算则跳过
-        if (r.nextUnClick > l.nextUnClick) return 1;
-        if (l.nextUnClick > r.nextUnClick) return -1;
+        if (parseFloat(r.nextUnClick) > parseFloat(l.nextUnClick)) return 1;
+        if (parseFloat(l.nextUnClick) > parseFloat(r.nextUnClick)) return -1;
 
         // 最后按目标进度排序
         if (pcr.focusTarget) {
