@@ -275,18 +275,22 @@ function calcNextUnClick(dataArray) {
     */
     if (pcr.showNextUnClick == 2) {
         dataArray.forEach(data => {
-            let unClickSet = new Set();
-            let allReachableSet = new Set();
+            let count = 0;
             //笨蛋嘉夜不会选公主连接词汇，第一层要过滤掉
             eachSuitableWord(data.tail, e => e.type != "puricone", dataL1 => {
+                ++count;
+                let unClickCount = 0;
+                let allReachableCount = 0;
                 //第二层是玩家选，全都可以通过，cond设为true
                 eachSuitableWord(dataL1.tail, e => true, dataL2 => {
-                    if (isUnClicked(dataL2)) unClickSet.add(dataL2.iconID + dataL2.name);
-                    allReachableSet.add(dataL2.iconID + dataL2.name);
+                    if (isUnClicked(dataL2))
+                        ++unClickCount;
+                    ++allReachableCount;
                 })
+                data.nextUnClick = unClickCount / allReachableCount;
             })
             //保留两位小数
-            data.nextUnClick = (unClickSet.size / allReachableSet.size * 100).toFixed(2);
+            data.nextUnClick = (data.nextUnClick / count).toFixed(2);
         });
     }
 }
