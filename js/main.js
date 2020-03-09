@@ -252,70 +252,65 @@ function calcNextUnClick(dataArray) {
         })
         return;
     };
-    if (pcr.showNextUnClick == 1) {
-        dataArray.forEach(data => {
-            data.nextUnClick = (recsvCalcUnClick(data, 0, 1) * 100).toFixed(2);
-        });
-        return;
-    }
-    if (pcr.showNextUnClick == 2) {
-        dataArray.forEach(data => {
-            data.nextUnClick = (recsvCalcUnClick(data, 0, 2) * 100).toFixed(2);
-        });
-        return;
-    }
-    if (pcr.showNextUnClick == 3) {
-        dataArray.forEach(data => {
-            data.nextUnClick = (recsvCalcUnClick(data, 0, 3) * 100).toFixed(2);
-        });
-        return;
-    }
+    dataArray.forEach(data => {
+        data.nextUnClick = (calcUnClick(data, pcr.showNextUnClick) * 100).toFixed(2);
+    });
+    return;
 }
+
+// /**
+//  * @brief 计算下一步能选到的new词汇
+//  * @detail 因为下一步是嘉夜进行选词，所以需要过滤掉公主连接词汇来计算new的数量
+//  * 
+//  * @param data 要计算的对象
+//  * @returns new词汇的比例（小数）
+// */
+// function calcNextOneStepUnClick(data) {
+//     let unClickCount = 0;
+//     let allReachableCount = 0;
+//     //笨蛋嘉夜不会选公主连接词汇，第一层要过滤掉
+//     eachSuitableWord(data.tail, e => e.type != "puricone", dataL1 => {
+//         if (isUnClicked(dataL1)) unClickCount++;
+//         allReachableCount++;
+//     })
+//     //保留两位小数
+//     return unClickCount / allReachableCount;
+// }
+
+// /**
+//  * @brief 计算下两步能选到的new词汇
+//  * @detail 因为下一步是嘉夜选词，而下两步是玩家选词，所以需要在第一层过滤掉公主连接词汇（嘉夜不会选），第二层正常全部计算
+//  * 
+//  * @param data 要计算的对象
+//  * @returns new词汇的比例（小数）
+// */
+// function calcNextTwoStepsUnClick(data) {
+//     let count = 0;
+//     let res = 0;
+//     //笨蛋嘉夜不会选公主连接词汇，第一层要过滤掉
+//     eachSuitableWord(data.tail, e => e.type != "puricone", dataL1 => {
+//         ++count;
+//         let unClickCount = 0;
+//         let allReachableCount = 0;
+//         //第二层是玩家选，全都可以通过，cond设为true
+//         eachSuitableWord(dataL1.tail, e => true, dataL2 => {
+//             if (isUnClicked(dataL2)) unClickCount++;
+//             allReachableCount++;
+//         })
+//         res += unClickCount / allReachableCount;
+//     })
+//     return res / count;
+// }
 
 /**
- * @brief 计算下一步能选到的new词汇
- * @detail 因为下一步是嘉夜进行选词，所以需要过滤掉公主连接词汇来计算new的数量
+ * @brief 递归计算接下来的新词比例
+ * @detail 因为下一步是嘉夜选词，而下两步是玩家选词，所以需要在偶数层过滤掉公主连接词汇（嘉夜不会选），奇数层全部计算
  * 
  * @param data 要计算的对象
+ * @param loop 当前递归层数
+ * @param maxLoop 最大递归层数
  * @returns new词汇的比例（小数）
 */
-function calcNextOneStepUnClick(data) {
-    let unClickCount = 0;
-    let allReachableCount = 0;
-    //笨蛋嘉夜不会选公主连接词汇，第一层要过滤掉
-    eachSuitableWord(data.tail, e => e.type != "puricone", dataL1 => {
-        if (isUnClicked(dataL1)) unClickCount++;
-        allReachableCount++;
-    })
-    //保留两位小数
-    return unClickCount / allReachableCount;
-}
-
-/**
- * @brief 计算下两步能选到的new词汇
- * @detail 因为下一步是嘉夜选词，而下两步是玩家选词，所以需要在第一层过滤掉公主连接词汇（嘉夜不会选），第二层正常全部计算
- * 
- * @param data 要计算的对象
- * @returns new词汇的比例（小数）
-*/
-function calcNextTwoStepsUnClick(data) {
-    let count = 0;
-    let res = 0;
-    //笨蛋嘉夜不会选公主连接词汇，第一层要过滤掉
-    eachSuitableWord(data.tail, e => e.type != "puricone", dataL1 => {
-        ++count;
-        let unClickCount = 0;
-        let allReachableCount = 0;
-        //第二层是玩家选，全都可以通过，cond设为true
-        eachSuitableWord(dataL1.tail, e => true, dataL2 => {
-            if (isUnClicked(dataL2)) unClickCount++;
-            allReachableCount++;
-        })
-        res += unClickCount / allReachableCount;
-    })
-    return res / count;
-}
-
 function recsvCalcUnClick(data, loop, maxLoop) {
     if (loop == maxLoop) return 0;
     let count = 0;
@@ -327,6 +322,14 @@ function recsvCalcUnClick(data, loop, maxLoop) {
     })
     res = res / 2 / count;
     return res;
+}
+
+function calcUnClick(data, loop) {
+    if (pcr.calcTable == undefined) pcr.calcTable = {};
+    if (pcr.calcTable[loop] == undefined) pcr.calcTable[loop] = {};
+    if (pcr.calcTable[loop][data.tail] == undefined)
+        pcr.calcTable[loop][data.tail] = recsvCalcUnClick(data, 0, loop);
+    return pcr.calcTable[loop][data.tail]
 }
 
 function sortDataArray(dataArray) {
@@ -494,6 +497,7 @@ function eachSuitableWord(tail, cond, func) {
 function removeClickHistory(name, iconID) {
     if (pcr.clickHistory.delete(iconID + name)) {
         localStorage.setItem("clickedHistory", JSON.stringify(Array.from(pcr.clickHistory)));
+        pcr.calcTable = {};
         return true;
     }
     return false;
@@ -503,6 +507,7 @@ function addClickHistory(name, iconID) {
     if (isClicked(name, iconID)) return false;
 
     pcr.clickHistory.add(iconID + name);
+    pcr.calcTable = {};
     localStorage.setItem("clickedHistory", JSON.stringify(Array.from(pcr.clickHistory)));
     return true;
 }
