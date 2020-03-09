@@ -151,8 +151,7 @@ $("#disableRightClick").click(e => {
 });
 
 $("#showNextUnClick").change(e => {
-    if (e.currentTarget.value == "综合计算") pcr.showNextUnClick = 3;
-    else pcr.showNextUnClick = parseInt(e.currentTarget.value);
+    pcr.showNextUnClick = parseInt(e.currentTarget.value);
     reProcess();
 });
 
@@ -255,19 +254,19 @@ function calcNextUnClick(dataArray) {
     };
     if (pcr.showNextUnClick == 1) {
         dataArray.forEach(data => {
-            data.nextUnClick = (calcNextOneStepUnClick(data) * 100).toFixed(2);
+            data.nextUnClick = (recsvCalcUnClick(data, 0, 1) * 100).toFixed(2);
         });
         return;
     }
     if (pcr.showNextUnClick == 2) {
         dataArray.forEach(data => {
-            data.nextUnClick = (calcNextTwoStepsUnClick(data) * 100).toFixed(2);
+            data.nextUnClick = (recsvCalcUnClick(data, 0, 2) * 100).toFixed(2);
         });
         return;
     }
     if (pcr.showNextUnClick == 3) {
         dataArray.forEach(data => {
-            data.nextUnClick = ((calcNextOneStepUnClick(data) + calcNextTwoStepsUnClick(data)) / 2 * 100).toFixed(2);
+            data.nextUnClick = (recsvCalcUnClick(data, 0, 3) * 100).toFixed(2);
         });
         return;
     }
@@ -315,6 +314,19 @@ function calcNextTwoStepsUnClick(data) {
         res += unClickCount / allReachableCount;
     })
     return res / count;
+}
+
+function recsvCalcUnClick(data, loop, maxLoop) {
+    if (loop == maxLoop) return 0;
+    let count = 0;
+    let res = 0;
+    eachSuitableWord(data.tail, (loop % 2) ? e => true : e => e.type != "puricone", nextData => {
+        ++count;
+        if (isUnClicked(nextData)) res++;
+        res += recsvCalcUnClick(nextData, loop + 1, maxLoop);
+    })
+    res = res / 2 / count;
+    return res;
 }
 
 function sortDataArray(dataArray) {
