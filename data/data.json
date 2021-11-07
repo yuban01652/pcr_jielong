@@ -1,5 +1,5 @@
 {
-	"updateTime":"Tue 2 Nov 2021 02:23:22",
+	"updateTime":"Mon 8 Nov 2021 03:17:35",
 	"meta":[
 		"a",
 		"ai",
@@ -494,11 +494,11 @@
 			"tail":"ao"
 		},
 		{
-			"name":"珠希的朋友",
+			"name":"义贼之友",
 			"type":"puricone",
 			"iconID":10018,
 			"desc":"指猫咪。珠希负责给它们喂食，据说开支不小。",
-			"head":"u",
+			"head":"i",
 			"tail":"ou"
 		},
 		{
