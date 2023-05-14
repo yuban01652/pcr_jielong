@@ -1,4 +1,4 @@
-### 本项目用于PCR2020三月活动接龙小游戏
+### 本项目用于PCR2023五月活动接龙小游戏
 
 #### fork说明
 
@@ -6,7 +6,7 @@
 
 #### 使用
 
-直接访问 https://twt233.github.io/pcr_jielong/ 即可
+直接访问 https://yuban01652.github.io/pcr_jielong/ 即可
 
 ### 以下是原README：
 

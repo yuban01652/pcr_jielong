@@ -191,7 +191,9 @@ function initData() {
     });
     pcr.showNextUnClick = parseInt($("#showNextUnClick").val());
     pcr.unClickAlwayHead = $("#unClickAlwayHead").prop("checked");
+    pcr.showName = true;
     $(document).bind('contextmenu', e => false); // 为了支持右键点击, 禁用右键菜单
+    pcr.grayShowUnClick = true;
     changeMode(pcr.mode);
     $("#popWindow").addClass("hide");
 }
@@ -318,9 +320,11 @@ function recsvCalcUnClick(data, loop, maxLoop) {
     eachSuitableWord(data.tail, (loop % 2) ? e => true : e => e.type != "puricone", nextData => {
         ++count;
         if (isUnClicked(nextData)) res++;
-        res += recsvCalcUnClick(nextData, loop + 1, maxLoop);
+        else
+            res += recsvCalcUnClick(nextData, loop + 1, maxLoop);
     })
-    res = res / 2 / count;
+    // res = res / 2 / count;
+    res = res / count;
     return res;
 }
 
